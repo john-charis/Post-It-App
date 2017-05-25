@@ -40,8 +40,8 @@ router.post('/user/signup', function(req, res) {
                 };
     firebase.auth().createUserWithEmailAndPassword(users.email, users.password)
     //extract user ID of just created user
-    .then(function(userRecord) {
-        users.uid = userRecord.uid;
+    .then(function(user) {
+        user.uid = user.uid;
         res.send(users);
         //add a new user to the database
         usersRef.push().set(users);
@@ -73,33 +73,31 @@ router.post('/user/signin',function(req, res){
 });
 
 
+
+//create group if you are signed in
 firebase.auth().onAuthStateChanged(function(user){
     if (user){
 
         router.post('/group', function(req, res){
             let groupName = req.body.groupName;
-            let user = null
+            let user = userId;
             console.log(groupName);
-            groupRef.push({name: groupName, users: {user}});
-             })
-             res.status(200).json({
-                status: 'OK'
-                message: 'A group named' +groupName 'has been created successfully!'
-                });
-            })
-            .catch(function(error){
-                res.status(400).json({
-                status: false,
-                message: 'Group Creation Failed!'
-                });
-            });
-        });
+            groupRef.push({name: groupName, user: {user}});
+            res.send ("group Created")
+        })
     }
+              
     else{
         let message = "Please Login to create a group";
         message;
     }
+
+
+
 });
+
+
+
 //update a user in the database
 router.put('/user/:id', function(req, res){
 	res.send({type: 'PUT'});
