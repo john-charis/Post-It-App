@@ -23,7 +23,7 @@ let groupRef = db.ref("group");
 
 
 // BASE ROUTES 
-app.get('/', function(req, res) {
+router.get('/', function(req, res) {
     res.send('welcome to POST IT APP!');
 });
 
@@ -39,6 +39,7 @@ router.post('/user/signup', function(req, res) {
                 password: req.body.password
                 };
     firebase.auth().createUserWithEmailAndPassword(users.email, users.password)
+    //extract user ID of just created user
     .then(function(userRecord) {
         users.uid = userRecord.uid;
         res.send(users);
@@ -47,7 +48,7 @@ router.post('/user/signup', function(req, res) {
         console.log("User has signed up");
     })
     .catch(function(error) {
-        res.send({message: errror.message});
+        res.send({message: error.message});
     })
 });
 
@@ -66,21 +67,39 @@ router.post('/user/signin',function(req, res){
     res.send("Successfully logged in")
 
     .catch(function(error) {
-        res.send({message: errror.message});
+        res.send({message: error.message});
     })
 	
 });
 
 
-//firebase.auth().onAuthStateChanged(function(user)){
-    //if user{
+firebase.auth().onAuthStateChanged(function(user){
+    if (user){
 
-        router.post('/users/group', function(req, res){
-        let groupName = req.body.groupName;
-
+        router.post('/group', function(req, res){
+            let groupName = req.body.groupName;
+            let user = null
+            console.log(groupName);
+            groupRef.push({name: groupName, users: {user}});
+             })
+             res.status(200).json({
+                status: 'OK'
+                message: 'A group named' +groupName 'has been created successfully!'
+                });
+            })
+            .catch(function(error){
+                res.status(400).json({
+                status: false,
+                message: 'Group Creation Failed!'
+                });
+            });
+        });
     }
-
-
+    else{
+        let message = "Please Login to create a group";
+        message;
+    }
+});
 //update a user in the database
 router.put('/user/:id', function(req, res){
 	res.send({type: 'PUT'});
