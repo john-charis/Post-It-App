@@ -18,8 +18,14 @@ const config = {
 firebase.initializeApp(config);
 let db = firebase.database();
 let usersRef = db.ref("users");
-let usersGroup = db.ref("group");
+let groupRef = db.ref("group");
 
+
+
+// BASE ROUTES 
+app.get('/', function(req, res) {
+    res.send('welcome to POST IT APP!');
+});
 
 //get a list of users from the database
 router.get('/user', function(req, res){
@@ -27,7 +33,7 @@ router.get('/user', function(req, res){
 });
 
 
-router.post('/user/signup', function(req, res){
+router.post('/user/signup', function(req, res) {
     let users = { username: req.body.username,
                 email: req.body.email,
                 password: req.body.password
@@ -69,13 +75,16 @@ router.post('/user/signin',function(req, res){
 //firebase.auth().onAuthStateChanged(function(user)){
     //if user{
 
-        router.post('/users/group')
+        router.post('/users/group', function(req, res){
+        let groupName = req.body.groupName;
+
+    }
 
 
 //update a user in the database
 router.put('/user/:id', function(req, res){
 	res.send({type: 'PUT'});
-});
+}); 
 
 //delete a user from the database
 router.delete('/user/:id', function(req, res){
