@@ -23,24 +23,24 @@ let groupRef = db.ref("group");
 
 
 // BASE ROUTES 
-router.get('/', function(req, res) {
+router.get('/', (req, res) => {
     res.send('welcome to POST IT APP!');
 });
 
 //get a list of users from the database
-router.get('/user', function(req, res){
-	res.send({type: 'GET'});
+router.get('/user', (req, res) => {
+    res.send({type: 'GET'});
 });
 
 
-router.post('/user/signup', function(req, res) {
+router.post('/user/signup', (req, res) => {
     let user = { username: req.body.username,
                 email: req.body.email,
                 password: req.body.password
                 };
     firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
    
-    .then(function(userRecord) {
+    .then(userRecord => {
         // Push the UserID into the user object
         user.uid = userRecord.uid;
         let userID = userRecord.uid
@@ -49,7 +49,7 @@ router.post('/user/signup', function(req, res) {
         res.send(user)
         console.log("User has signed up");
     })
-    .catch(function(error) {
+    .catch(error => {
         res.send({message: error.message});
     })
 });
@@ -58,32 +58,32 @@ router.post('/user/signup', function(req, res) {
 
 
 //sign in user
-router.post('/user/signin',function(req, res){
-	
-	let email = req.body.email;
+router.post('/user/signin',(req, res) => {
+    
+    let email = req.body.email;
     let password = req.body.password;
     let username = req.body.username;
 
     firebase.auth().signInWithEmailAndPassword(email, password) 
-    .then(function(){
+    .then(() => {
 
     console.log("User has logged in");
     res.send("Successfully logged in")
     })
 
-    .catch(function(error) {
+    .catch(error => {
        res.send({message: error.message});
     });
-	
+    
 });
 
 
 
 //create group if you are signed in
-firebase.auth().onAuthStateChanged(function(user){
+firebase.auth().onAuthStateChanged(user => {
     if (user){
 
-        router.post('/group', function(req, res){
+        router.post('/group', (req, res) => {
             let groupName = req.body.groupName;
             let groupCreator = user.uid;
             
@@ -101,16 +101,19 @@ firebase.auth().onAuthStateChanged(function(user){
 
 });
 
+//add users.group
+
+
 
 
 //update a user in the database
-router.put('/user/:id', function(req, res){
-	res.send({type: 'PUT'});
-}); 
+router.put('/user/:id', (req, res) => {
+    res.send({type: 'PUT'});
+});
 
 //delete a user from the database
-router.delete('/user/:id', function(req, res){
-	res.send({type: 'DELETE'});
+router.delete('/user/:id', (req, res) => {
+    res.send({type: 'DELETE'});
 });
 
 
