@@ -34,17 +34,19 @@ router.get('/user', function(req, res){
 
 
 router.post('/user/signup', function(req, res) {
-    let users = { username: req.body.username,
+    let user = { username: req.body.username,
                 email: req.body.email,
                 password: req.body.password
                 };
-    firebase.auth().createUserWithEmailAndPassword(users.email, users.password)
-    //extract user ID of just created user
-    .then(function(user) {
-        user.uid = user.uid;
-        res.send(users);
-        //add a new user to the database
-        usersRef.push().set(users);
+    firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+   
+    .then(function(userRecord) {
+        // Push the UserID into the user object
+        user.uid = userRecord.uid;
+        let userID = userRecord.uid
+        //Push to the database using uid as key
+        usersRef.update({[userID] :user});
+        res.send(user)
         console.log("User has signed up");
     })
     .catch(function(error) {
@@ -62,13 +64,16 @@ router.post('/user/signin',function(req, res){
     let password = req.body.password;
     let username = req.body.username;
 
-    firebase.auth().signInWithEmailAndPassword(email, password)    
+    firebase.auth().signInWithEmailAndPassword(email, password) 
+    .then(function(){
+
     console.log("User has logged in");
     res.send("Successfully logged in")
+    })
 
     .catch(function(error) {
-        res.send({message: error.message});
-    })
+       res.send({message: error.message});
+    });
 	
 });
 
@@ -80,10 +85,11 @@ firebase.auth().onAuthStateChanged(function(user){
 
         router.post('/group', function(req, res){
             let groupName = req.body.groupName;
-            let user = userId;
-            console.log(groupName);
-            groupRef.push({name: groupName, user: {user}});
-            res.send ("group Created")
+            let groupCreator = user.uid;
+            
+            groupRef.push({name: groupName, members: {groupCreator}});
+            res.send('Group Created Successfully!')
+            console.log('User Created A Group');
         })
     }
               
@@ -91,7 +97,6 @@ firebase.auth().onAuthStateChanged(function(user){
         let message = "Please Login to create a group";
         message;
     }
-
 
 
 });
